@@ -1,0 +1,180 @@
+/* === Общие стили === */
+body {
+    background: linear-gradient(135deg, #1E3C72, #2A5298); /* синий градиент */
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #f5f9ff;
+    margin: 0;
+    padding: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    text-align: center;
+}
+
+/* === Главная страница === */
+.home-container {
+    max-width: 900px;
+    padding: 20px;
+}
+
+.home-title {
+    font-size: 42px;
+    font-weight: 800;
+    color: #FFD84D; /* жёлтый */
+    margin: 0 0 25px 0;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.home-image {
+    display: block;
+    margin: 0 auto 30px auto;
+    max-width: 650px;
+    width: 100%;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+
+.home-actions {
+    margin-top: 10px;
+}
+
+.home-link {
+    color: #ffffff;
+    font-weight: 700;
+    text-decoration: none;
+    margin: 0 15px;
+    padding: 12px 24px;
+    border: 2px solid rgba(255,255,255,0.8);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.home-link:hover {
+    background: rgba(255,255,255,0.15);
+    border-color: #ffffff;
+}
+
+/* === Формы регистрации и входа === */
+.register-container,
+.login-container {
+    max-width: 400px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.register-title,
+.login-title {
+    font-size: 36px;
+    font-weight: 800;
+    color: #FFD84D; /* жёлтый */
+    margin-bottom: 25px;
+    text-transform: uppercase;
+}
+
+.register-form,
+.login-form {
+    background: rgba(255, 255, 255, 0.08);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+/* Поля формы */
+.form-field {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    text-align: left;
+    width: 100%;
+}
+
+.form-field label {
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #f5f9ff;
+}
+
+.form-field input,
+.form-field select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #00d4ff;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+/* Кнопки */
+.register-btn,
+.login-btn {
+    background: linear-gradient(90deg, #00d4ff, #0077ff);
+    border: none;
+    padding: 12px;
+    color: white;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
+}
+
+.register-btn:hover,
+.login-btn:hover {
+    background: linear-gradient(90deg, #ff7e5f, #feb47b); /* оранжевый при наведении */
+}
+
+/* Ссылки под формами */
+.login-link,
+.register-link {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #fff;
+}
+
+.login-link a,
+.register-link a {
+    color: #ffffff;
+    font-weight: bold;
+    text-decoration: underline;
+}
+.admin-container {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.admin-title {
+    font-size: 36px;
+    font-weight: 800;
+    color: #FFD84D; /* жёлтый */
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
+.admin-actions {
+    margin-top: 20px;
+}
+
+.admin-actions .home-link {
+    color: #ffffff;
+    font-weight: 700;
+    text-decoration: none;
+    margin: 0 12px;
+    padding: 10px 18px;
+    border: 2px solid rgba(255,255,255,0.75);
+    border-radius: 8px;
+    transition: all 0.25s ease;
+    display: inline-block;
+}
+
+.admin-actions .home-link:hover {
+    background: rgba(255,255,255,0.12);
+    border-color: #ffffff;
+}

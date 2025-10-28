@@ -1,0 +1,36 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'style.css' %}">
+
+<div class="register-container">
+  <h1 class="register-title">РЕГИСТРАЦИЯ</h1>
+
+  <form method="post" class="register-form">
+    {% csrf_token %}
+    <div class="form-field">
+      {{ form.username.label_tag }}
+      {{ form.username }}
+    </div>
+    <div class="form-field">
+      {{ form.email.label_tag }}
+      {{ form.email }}
+    </div>
+    <div class="form-field">
+      {{ form.role.label_tag }}
+      {{ form.role }}
+    </div>
+    <div class="form-field">
+      {{ form.password1.label_tag }}
+      {{ form.password1 }}
+    </div>
+    <div class="form-field">
+      {{ form.password2.label_tag }}
+      {{ form.password2 }}
+    </div>
+
+    <button type="submit" class="register-btn">Зарегистрироваться</button>
+  </form>
+
+  <div class="login-link">
+    Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a>
+  </div>
+</div>

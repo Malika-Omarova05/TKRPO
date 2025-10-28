@@ -1,0 +1,13 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'style.css' %}">
+
+<div class="home-container">
+  <h1 class="home-title">Добро пожаловать на сайт для поиска работы</h1>
+
+  <img src="{% static 'welcome.png' %}" alt="Добро пожаловать" class="home-image">
+
+  <div class="home-actions">
+    <a href="{% url 'login' %}" class="home-link">Войти</a>
+    <a href="{% url 'register' %}" class="home-link">Регистрация</a>
+  </div>
+</div>

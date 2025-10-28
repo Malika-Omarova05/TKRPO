@@ -1,0 +1,24 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'style.css' %}">
+
+<div class="login-container">
+  <h1 class="login-title">ВХОД</h1>
+
+  <form method="post" class="login-form">
+    {% csrf_token %}
+    <div class="form-field">
+      {{ form.username.label_tag }}
+      {{ form.username }}
+    </div>
+    <div class="form-field">
+      {{ form.password.label_tag }}
+      {{ form.password }}
+    </div>
+
+    <button type="submit" class="login-btn">Войти</button>
+  </form>
+
+  <div class="register-link">
+    Нет аккаунта? <a href="{% url 'register' %}">Регистрация</a>
+  </div>
+</div>
