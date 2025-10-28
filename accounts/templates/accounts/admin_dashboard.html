@@ -1,0 +1,38 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'style.css' %}">
+
+<div class="admin-container">
+  <h1>Панель администратора</h1>
+
+  <h2>Резюме соискателей</h2>
+  <table>
+    <tr><th>Заголовок</th><th>Описание</th><th>Действие</th></tr>
+    {% for resume in resumes %}
+      <tr>
+        <td>{{ resume.title }}</td>
+        <td>{{ resume.description|truncatewords:15 }}</td>
+        <td>
+          <a href="{% url 'delete_resume' resume.id %}" class="delete-btn">Удалить</a>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="3">Нет резюме</td></tr>
+    {% endfor %}
+  </table>
+
+  <h2>Объявления работодателей</h2>
+  <table>
+    <tr><th>Заголовок</th><th>Описание</th><th>Действие</th></tr>
+    {% for job in jobs %}
+      <tr>
+        <td>{{ job.title }}</td>
+        <td>{{ job.description|truncatewords:15 }}</td>
+        <td>
+          <a href="{% url 'delete_job' job.id %}" class="delete-btn">Удалить</a>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="3">Нет объявлений</td></tr>
+    {% endfor %}
+  </table>
+</div>
