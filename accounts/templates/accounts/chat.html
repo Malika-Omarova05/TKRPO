@@ -1,0 +1,140 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Чат по вакансии</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(135deg, #1b3b6f, #27496d);
+            color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chat-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
+            max-width: 600px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 26px;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 400px;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .message.self {
+            background-color: #28a745;
+            color: white;
+            align-self: flex-end;
+        }
+
+        .message.other {
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #333;
+            align-self: flex-start;
+        }
+
+        form {
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: none;
+            outline: none;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 15px;
+            color: #9bdcff;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .chat-container {
+                padding: 20px 25px;
+                margin: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <h1>Чат по вакансии: {{ chat.vacancy.title }}</h1>
+
+        <div class="messages">
+            {% for msg in messages %}
+                <div class="message {% if msg.sender == user %}self{% else %}other{% endif %}">
+                    <strong>{{ msg.sender.username }}:</strong> {{ msg.text }}
+                    <div style="font-size: 10px; text-align: right;">{{ msg.timestamp|date:"d.m.Y H:i" }}</div>
+                </div>
+            {% empty %}
+                <p style="text-align:center; color:#ccc;">Сообщений пока нет</p>
+            {% endfor %}
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <input type="text" name="text" placeholder="Введите сообщение..." required>
+            <button type="submit">Отправить</button>
+        </form>
+
+        <a href="{% url 'profile' %}" class="back-link">⬅ Вернуться в личный кабинет</a>
+    </div>
+</body>
+</html>

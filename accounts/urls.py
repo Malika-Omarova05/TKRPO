@@ -34,4 +34,15 @@ urlpatterns = [
     # ---------------------------
     path('resume/create/', views.create_resume, name='create_resume'),
     path('resume/<int:resume_id>/edit/', views.edit_resume, name='edit_resume'),
+
+    # ---------------------------
+    # Вакансии
+    # ---------------------------
+    path('vacancies/', views.vacancy_list, name='vacancy_list'),  # список всех вакансий
+    path('vacancy/<int:vacancy_id>/respond/', views.respond_to_vacancy, name='respond_to_vacancy'),
+
+    # ---------------------------
+    # Чат
+    # ---------------------------
+    path('chat/<int:chat_id>/', views.chat_view, name='chat_view'),
 ]

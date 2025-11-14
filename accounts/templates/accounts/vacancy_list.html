@@ -1,0 +1,80 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Вакансии</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(135deg, #1b3b6f, #27496d);
+            color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .vacancy {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+        }
+
+        .vacancy h3 {
+            margin: 0 0 10px 0;
+        }
+
+        .vacancy p {
+            margin: 5px 0;
+        }
+
+        .apply-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 12px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: 0.3s;
+        }
+
+        .apply-btn:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Список вакансий</h1>
+
+        {% for vacancy in vacancies %}
+            <div class="vacancy">
+                <h3>{{ vacancy.title }}</h3>
+                <p>{{ vacancy.description }}</p>
+                <p>Работодатель: {{ vacancy.employer.username }}</p>
+                <a href="{% url 'respond_to_vacancy' vacancy.id %}" class="apply-btn">Откликнуться</a>
+            </div>
+        {% empty %}
+            <p>Вакансий пока нет.</p>
+        {% endfor %}
+
+        <p style="text-align:center;"><a href="{% url 'profile' %}" style="color:#9bdcff;">⬅ Вернуться в профиль</a></p>
+    </div>
+</body>
+</html>

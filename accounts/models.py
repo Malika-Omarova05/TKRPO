@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-#  Кастомная модель пользователя
+# Кастомная модель пользователя
 class CustomUser(AbstractUser):
     ROLE_CHOICES = (
         ('employer', 'Работодатель'),
@@ -14,7 +14,7 @@ class CustomUser(AbstractUser):
         return f"{self.username} ({self.role})"
 
 
-#  Профиль пользователя (личный кабинет)
+# Профиль пользователя (личный кабинет)
 class Profile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='profile')
     phone = models.CharField("Телефон", max_length=20, blank=True)
@@ -26,7 +26,7 @@ class Profile(models.Model):
         return f"Профиль {self.user.username}"
 
 
-#  Резюме (для соискателя)
+# Резюме (для соискателя)
 class Resume(models.Model):
     seeker = models.ForeignKey(CustomUser, on_delete=models.CASCADE, limit_choices_to={'role': 'seeker'}, related_name='resumes')
     title = models.CharField("Название резюме", max_length=200)
@@ -50,3 +50,28 @@ class JobPost(models.Model):
 
     def __str__(self):
         return f"Вакансия: {self.title} ({self.employer.username})"
+
+
+# Чат между соискателем и работодателем по вакансии
+class Chat(models.Model):
+    vacancy = models.ForeignKey(JobPost, on_delete=models.CASCADE, related_name='chats')
+    seeker = models.ForeignKey(CustomUser, on_delete=models.CASCADE, limit_choices_to={'role': 'seeker'}, related_name='seeker_chats')
+    employer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, limit_choices_to={'role': 'employer'}, related_name='employer_chats')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('vacancy', 'seeker', 'employer')
+
+    def __str__(self):
+        return f"Чат: {self.vacancy.title} | Соискатель: {self.seeker.username} | Работодатель: {self.employer.username}"
+
+
+# Сообщения в чате
+class Message(models.Model):
+    chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name='messages')
+    sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    text = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Сообщение от {self.sender.username} в чате {self.chat.id} в {self.timestamp}"

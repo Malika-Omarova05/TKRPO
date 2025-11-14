@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import CustomUserCreationForm, CustomAuthenticationForm, ProfileForm, ResumeForm
-from .models import CustomUser, Resume, JobPost, Profile
+from .models import CustomUser, Resume, JobPost, Profile, Chat, Message
 
 # ---------------------------
 # Регистрация
@@ -12,8 +12,7 @@ def register(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)  # сразу авторизуем
-            # перенаправление по роли
+            login(request, user)
             if user.role == 'employer':
                 return redirect('employer_home')
             elif user.role == 'seeker':
@@ -22,7 +21,6 @@ def register(request):
                 return redirect('admin_home')
             return redirect('home')
         else:
-            # если форма не валидна, ошибки будут отображены
             return render(request, 'accounts/register.html', {'form': form})
     else:
         form = CustomUserCreationForm()
@@ -126,7 +124,7 @@ def profile_view(request):
         form = ProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
             form.save()
-            return redirect('profile')  # перенаправление после сохранения
+            return redirect('profile')
     else:
         form = ProfileForm(instance=profile)
 
@@ -179,3 +177,61 @@ def edit_resume(request, resume_id):
         'form': form,
         'title': 'Редактировать резюме'
     })
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import CustomUser, Resume, JobPost, Profile, Chat, Message
+
+# ---------------------------
+# Создание чата при отклике на вакансию
+# ---------------------------
+@login_required
+def respond_to_vacancy(request, vacancy_id):
+    vacancy = get_object_or_404(JobPost, id=vacancy_id)
+    seeker = request.user
+    employer = vacancy.employer
+
+    # Создаем чат, если его еще нет
+    chat, created = Chat.objects.get_or_create(
+        vacancy=vacancy,
+        seeker=seeker,
+        employer=employer
+    )
+
+    return redirect('chat_view', chat_id=chat.id)
+
+# ---------------------------
+# Просмотр и отправка сообщений в чате
+# ---------------------------
+@login_required
+def chat_view(request, chat_id):
+    chat = get_object_or_404(Chat, id=chat_id)
+
+    # Проверка, что пользователь — участник чата
+    if request.user != chat.seeker and request.user != chat.employer:
+        return redirect('home')  # или можно выдать 403
+
+    if request.method == 'POST':
+        text = request.POST.get('text')
+        if text:
+            Message.objects.create(chat=chat, sender=request.user, text=text)
+            return redirect('chat_view', chat_id=chat.id)
+
+    # Получаем все сообщения чата по времени
+    messages = chat.messages.order_by('timestamp')
+    return render(request, 'accounts/chat.html', {
+        'chat': chat,
+        'messages': messages
+    })
+
+# ---------------------------
+# Список вакансий (для соискателя)
+# ---------------------------
+@login_required
+def vacancy_list(request):
+    # Можно показывать все вакансии или фильтровать по какой-то логике
+    vacancies = JobPost.objects.all()
+    return render(request, 'accounts/vacancy_list.html', {
+        'vacancies': vacancies
+    })
+
