@@ -16,7 +16,7 @@
         .container {
             max-width: 900px;
             margin: auto;
-            background: white;
+            background: #ffffff;
             padding: 40px;
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
@@ -41,6 +41,13 @@
             font-size: 22px;
         }
 
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0 30px 0;
+        }
+
         .section {
             margin-bottom: 30px;
         }
@@ -52,17 +59,23 @@
             font-size: 20px;
         }
 
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin: 15px 0;
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
         }
 
-        .skills {
-            background: #f1f3f5;
-            padding: 15px;
-            border-radius: 8px;
+        .skills span {
+            background: #007bff;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        p {
+            margin-bottom: 8px;
         }
 
         ul {
@@ -72,23 +85,30 @@
         li {
             margin: 8px 0;
         }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            color: #6c757d;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
         <h1>{{ resume.full_name }}</h1>
-        <h2>{{ resume.position }}</h2>
+        <h2>{{ resume.position|default:"Должность не указана" }}</h2>
         {% if resume.salary_expectation %}
             <p><strong>Ожидаемая зарплата:</strong> {{ resume.salary_expectation }} сом</p>
         {% endif %}
     </div>
 
     <div class="info-grid">
-        <div><strong>Телефон:</strong> {{ resume.phone }}</div>
-        <div><strong>Email:</strong> {{ resume.email }}</div>
-        <div><strong>Город:</strong> {{ resume.location }}</div>
-        <div><strong>Опыт:</strong> {{ resume.experience_years }} лет</div>
+        {% if resume.phone %}<div><strong>Телефон:</strong> {{ resume.phone }}</div>{% endif %}
+        {% if resume.email %}<div><strong>Email:</strong> {{ resume.email }}</div>{% endif %}
+        {% if resume.location %}<div><strong>Город:</strong> {{ resume.location }}</div>{% endif %}
+        {% if resume.experience_years %}<div><strong>Опыт:</strong> {{ resume.experience_years }} лет</div>{% endif %}
     </div>
 
     {% if resume.about %}
@@ -103,9 +123,7 @@
             <h3>Навыки</h3>
             <div class="skills">
                 {% for skill in resume.skills|split:"," %}
-                    <span style="background:#007bff;color:white;padding:5px 12px;margin:5px;display:inline-block;border-radius:20px;">
-                {{ skill|trim }}
-            </span>
+                    <span>{{ skill|trim }}</span>
                 {% endfor %}
             </div>
         </div>
@@ -125,7 +143,7 @@
         </div>
     {% endif %}
 
-    <div style="text-align:center;margin-top:50px;color:#6c757d;font-size:12px;">
+    <div class="footer">
         Резюме сгенерировано на платформе «ТКРПО» • {{ now|date:"d.m.Y" }}
     </div>
 </div>

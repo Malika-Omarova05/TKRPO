@@ -4,59 +4,191 @@
 {% block title %}Отклики на вакансии{% endblock %}
 
 {% block content %}
+<style>
+:root {
+    --gray-dark: #6F7375;
+    --gray-medium: #A7A9AC;
+    --beige-dark: #A49786;
+    --beige-light: #D9CBBF;
+    --cream: #F9F6EF;
+    --background: #FAF9F6;
+    --text-dark: #4B4A48;
+    --text-light: #9E9A90;
+}
+
+/* Заголовок */
+.page-title {
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 35px;
+    text-align: center;
+}
+
+/* Карточка */
+.applications-card {
+    background: var(--cream);
+    border-radius: 24px;
+    padding: 30px;
+    border: 1px solid rgba(164,147,134,0.25);
+    box-shadow: 0 14px 36px rgba(164,147,134,0.15);
+}
+
+/* Отклик */
+.application-item {
+    padding-bottom: 25px;
+    margin-bottom: 25px;
+    border-bottom: 1px solid rgba(164,147,134,0.25);
+}
+.application-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+/* Имя соискателя */
+.applicant-name {
+    color: var(--beige-dark);
+    font-weight: 700;
+    text-decoration: none;
+}
+.applicant-name:hover {
+    text-decoration: underline;
+}
+
+/* Текст отклика */
+.application-meta {
+    color: var(--gray-dark);
+}
+
+/* Бейдж статуса */
+.status-badge {
+    border-radius: 12px;
+    padding: 6px 14px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status-sent {
+    background: var(--gray-medium);
+    color: white;
+}
+.status-viewed {
+    background: var(--beige-dark);
+    color: var(--cream);
+}
+.status-interview {
+    background: #8fbf8f;
+    color: white;
+}
+.status-rejected {
+    background: #d66a6a;
+    color: white;
+}
+.status-hired {
+    background: linear-gradient(135deg, var(--beige-dark), var(--beige-light));
+    color: var(--cream);
+}
+
+/* Селектор статуса */
+.status-select {
+    border-radius: 16px !important;
+    border: 1px solid var(--gray-medium);
+    padding: 4px 8px;
+}
+.status-select:focus {
+    border-color: var(--beige-dark);
+    box-shadow: 0 0 0 4px rgba(164,147,134,0.22);
+}
+
+/* Анимация */
+.fade-up {
+    opacity: 0;
+    transform: translateY(15px);
+    transition: 0.6s ease;
+}
+.fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+</style>
+
 <div class="container py-5">
-    <h2 class="mb-4">Отклики на вакансии ({{ applications.count }})</h2>
 
-    <div class="card border-0 shadow-sm">
-        <div class="card-body">
-            {% for application in applications %}
-                <div class="border-bottom pb-3 mb-4">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div class="flex-grow-1">
-                            <h6 class="fw-bold mb-1">
-                                <a href="{% url 'jobseekers:resume_detail' application.jobseeker.user.username %}"
-                                   class="text-decoration-none text-primary">
-                                    {{ application.jobseeker.user.get_full_name|default:application.jobseeker.user.username }}
-                                </a>
-                                → {{ application.vacancy.title }}
-                            </h6>
-                            <p class="text-muted small mb-2">
-                                Откликнулся: {{ application.applied_at|date:"d.m.Y в H:i" }}
-                                {% if application.cover_letter %}
-                                    <br><em>{{ application.cover_letter|truncatewords:30 }}</em>
-                                {% endif %}
-                            </p>
+    <h2 class="page-title">Отклики на вакансии ({{ applications.count }})</h2>
 
-                            <!-- Текущий статус -->
-                            <span class="badge
-                                {% if application.status == 'viewed' %}bg-info
-                                {% elif application.status == 'interview' %}bg-success
-                                {% elif application.status == 'rejected' %}bg-danger
-                                {% elif application.status == 'hired' %}bg-primary
-                                {% else %}bg-secondary{% endif %} fs-6">
-                                {{ application.get_status_display }}
-                            </span>
-                        </div>
+    <div class="applications-card">
 
-                        <!-- ПРОСТАЯ ФОРМА — КАК В КАБИНЕТЕ СОИСКАТЕЛЯ -->
-                        <div class="text-end">
-                            <form method="post" action="{% url 'employers:update_application_status' application.id %}" class="d-inline">
-                                {% csrf_token %}
-                                <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
-                                    <option value="sent"      {% if application.status == 'sent' %}selected{% endif %}>Отправлено</option>
-                                    <option value="viewed"    {% if application.status == 'viewed' %}selected{% endif %}>Просмотрено</option>
-                                    <option value="interview" {% if application.status == 'interview' %}selected{% endif %}>Приглашён</option>
-                                    <option value="rejected"  {% if application.status == 'rejected' %}selected{% endif %}>Отказано</option>
-                                    <option value="hired"     {% if application.status == 'hired' %}selected{% endif %}>Принят</option>
-                                </select>
-                            </form>
-                        </div>
-                    </div>
+        {% for application in applications %}
+        <div class="application-item fade-up">
+
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+
+                    <!-- Имя соискателя -->
+                    <h6 class="fw-bold mb-1">
+                        <a href="{% url 'jobseekers:resume_detail' application.jobseeker.user.username %}"
+                           class="applicant-name">
+                            {{ application.jobseeker.user.get_full_name|default:application.jobseeker.user.username }}
+                        </a>
+                        → {{ application.vacancy.title }}
+                    </h6>
+
+                    <!-- Дата + сопроводительное письмо -->
+                    <p class="application-meta small mb-2">
+                        Откликнулся: {{ application.applied_at|date:"d.m.Y в H:i" }}<br>
+                        {% if application.cover_letter %}
+                            <em>{{ application.cover_letter|truncatewords:30 }}</em>
+                        {% endif %}
+                    </p>
+
+                    <!-- Бейдж статуса -->
+                    <span class="status-badge
+                        {% if application.status == 'sent' %}status-sent
+                        {% elif application.status == 'viewed' %}status-viewed
+                        {% elif application.status == 'interview' %}status-interview
+                        {% elif application.status == 'rejected' %}status-rejected
+                        {% elif application.status == 'hired' %}status-hired
+                        {% endif %}">
+                        {{ application.get_status_display }}
+                    </span>
                 </div>
-            {% empty %}
-                <p class="text-muted text-center py-5">Пока нет откликов на ваши вакансии</p>
-            {% endfor %}
+
+                <!-- Форма изменения статуса -->
+                <div class="text-end ms-3">
+                    <form method="post"
+                          action="{% url 'employers:update_application_status' application.id %}">
+                        {% csrf_token %}
+                        <select name="status" class="form-select form-select-sm status-select"
+                                onchange="this.form.submit()">
+                            <option value="sent"      {% if application.status == 'sent' %}selected{% endif %}>Отправлено</option>
+                            <option value="viewed"    {% if application.status == 'viewed' %}selected{% endif %}>Просмотрено</option>
+                            <option value="interview" {% if application.status == 'interview' %}selected{% endif %}>Приглашён</option>
+                            <option value="rejected"  {% if application.status == 'rejected' %}selected{% endif %}>Отказано</option>
+                            <option value="hired"     {% if application.status == 'hired' %}selected{% endif %}>Принят</option>
+                        </select>
+                    </form>
+                </div>
+
+            </div>
+
         </div>
+        {% empty %}
+        <p class="text-center text-light py-5">Пока нет откликов на ваши вакансии</p>
+        {% endfor %}
+
     </div>
 </div>
+
+<script>
+/* Анимация появления */
+const items = document.querySelectorAll(".fade-up");
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+        if (e.isIntersecting) e.target.classList.add("visible");
+    });
+});
+items.forEach(i => observer.observe(i));
+</script>
+
 {% endblock %}

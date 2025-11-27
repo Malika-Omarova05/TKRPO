@@ -7,15 +7,15 @@
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white">
-                    <h4 class="mb-0">Добавить образование</h4>
+            <div class="card border-0 shadow-sm" style="border-radius: 15px; background-color: #fdf8f2;">
+                <div class="card-header" style="background-color: #f5efe6; border-radius: 15px 15px 0 0;">
+                    <h4 class="mb-0 fw-bold text-dark">Добавить образование</h4>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-5">
                     <form method="post">
                         {% csrf_token %}
 
-                        <!-- Показываем ошибки (если будут) -->
+                        <!-- Ошибки формы -->
                         {% if form.errors %}
                             <div class="alert alert-danger mb-4">
                                 {% for field in form %}
@@ -26,49 +26,51 @@
                             </div>
                         {% endif %}
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Учебное заведение *</label>
-                            {{ form.institution|add_class:"form-control"|attr:"required" }}
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Учебное заведение *</label>
+                            {{ form.institution|add_class:"form-control form-control-lg"|attr:"placeholder:Название университета|required" }}
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Факультет</label>
-                            {{ form.faculty|add_class:"form-control" }}
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Факультет</label>
+                            {{ form.faculty|add_class:"form-control form-control-lg"|attr:"placeholder:Факультет" }}
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Специальность *</label>
-                            {{ form.specialty|add_class:"form-control"|attr:"required" }}
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Специальность *</label>
+                            {{ form.specialty|add_class:"form-control form-control-lg"|attr:"placeholder:Специальность|required" }}
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Степень</label>
-                            {{ form.degree|add_class:"form-control" }}
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Степень</label>
+                            {{ form.degree|add_class:"form-select form-select-lg" }}
                         </div>
 
-                        <!-- КРАСИВЫЙ КАЛЕНДАРЬ + АВТОМАТИЧЕСКОЕ ИЗВЛЕЧЕНИЕ ГОДА -->
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Год начала *</label>
-                                <input type="date" class="form-control" id="id_start_year_date" required>
+                        <!-- Даты обучения -->
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Год начала *</label>
+                                <input type="date" class="form-control form-control-lg" id="id_start_year_date" required>
                                 <input type="hidden" name="start_year" id="id_start_year">
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Год окончания</label>
-                                <input type="date" class="form-control" id="id_end_year_date">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Год окончания</label>
+                                <input type="date" class="form-control form-control-lg" id="id_end_year_date">
                                 <input type="hidden" name="end_year" id="id_end_year">
-                                <small class="text-muted">Оставьте пустым, если учитесь сейчас</small>
+                                <small class="text-muted d-block">Оставьте пустым, если учитесь сейчас</small>
                             </div>
                         </div>
 
                         <div class="form-check mb-4">
                             {{ form.is_current|add_class:"form-check-input" }}
-                            <label class="form-check-label fw-bold">Учусь в настоящее время</label>
+                            <label class="form-check-label fw-semibold">Учусь в настоящее время</label>
                         </div>
 
                         <div class="text-end">
-                            <a href="{% url 'jobseekers:cabinet' %}" class="btn btn-secondary px-4">Отмена</a>
-                            <button type="submit" class="btn btn-success px-5 ms-2">Сохранить</button>
+                            <a href="{% url 'jobseekers:cabinet' %}" class="btn btn-outline-secondary btn-lg px-4">Отмена</a>
+                            <button type="submit" class="btn btn-success btn-lg px-5 ms-3" style="background: linear-gradient(135deg, #A49786, #D9CBBF); border:none; color:#fdf8f2;">
+                                Сохранить
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -85,41 +87,26 @@ document.addEventListener('DOMContentLoaded', function () {
     const endYearHidden = document.getElementById('id_end_year');
     const isCurrent = document.querySelector('[name="is_current"]');
 
-    // Преобразуем дату → год
-    function updateHiddenFields() {
-        if (startDateInput.value) {
-            startYearHidden.value = new Date(startDateInput.value).getFullYear();
-        }
-        if (endDateInput.value) {
-            endYearHidden.value = new Date(endDateInput.value).getFullYear();
-        } else {
-            endYearHidden.value = '';
-        }
-    }
-
-    // При выборе даты — записываем год в скрытое поле
-    startDateInput.addEventListener('change', updateHiddenFields);
-    endDateInput.addEventListener('change', updateHiddenFields);
-
-    // Если "Учусь сейчас" — очищаем и блокируем окончание
-    function toggleEndDate() {
-        if (isCurrent.checked) {
+    function updateYears() {
+        startYearHidden.value = startDateInput.value ? new Date(startDateInput.value).getFullYear() : '';
+        endYearHidden.value = endDateInput.value ? new Date(endDateInput.value).getFullYear() : '';
+        if(isCurrent.checked){
             endDateInput.value = '';
             endDateInput.disabled = true;
             endYearHidden.value = '';
         } else {
             endDateInput.disabled = false;
         }
-        updateHiddenFields();
     }
 
+    startDateInput.addEventListener('change', updateYears);
+    endDateInput.addEventListener('change', updateYears);
     if (isCurrent) {
-        isCurrent.addEventListener('change', toggleEndDate);
-        toggleEndDate(); // при загрузке
+        isCurrent.addEventListener('change', updateYears);
+        updateYears();
     }
 
-    // При отправке формы — гарантируем, что год записан
-    document.querySelector('form').addEventListener('submit', updateHiddenFields);
+    document.querySelector('form').addEventListener('submit', updateYears);
 });
 </script>
 {% endblock %}

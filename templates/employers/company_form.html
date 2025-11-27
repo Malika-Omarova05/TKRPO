@@ -5,96 +5,181 @@
 {% block title %}Редактировать компанию — {{ object.name }}{% endblock %}
 
 {% block content %}
-    <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-9">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+<style>
+:root {
+    --beige-dark: #A49786;
+    --beige-light: #D9CBBF;
+    --cream: #F9F6EF;
+    --gray-dark: #6F7375;
+    --text-dark: #4B4A48;
+}
 
-                        <h4 class="mb-0">
-                            Редактирование профиля компании
-                        </h4>
-                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="history.back()">
-                            ← Назад
-                        </button>
+/* Общие стили */
+body {
+    background: var(--cream);
+    color: var(--text-dark);
+}
 
-                    </div>
+/* Карточка формы */
+.card-form {
+    border-radius: 24px;
+    background: var(--cream);
+    box-shadow: 0 10px 25px rgba(164,147,134,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card-form:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(164,147,134,0.15);
+}
 
-                    <div class="card-body p-5">
-                        <form method="post" enctype="multipart/form-data">
-                            {% csrf_token %}
+/* Логотип */
+.logo-container {
+    width: 140px;
+    height: 140px;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 4px solid var(--beige-light);
+    position: relative;
+    margin: 0 auto;
+}
+.logo-container img,
+.logo-container .fallback-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.fallback-logo {
+    font-size: 3rem;
+    color: var(--cream);
+    background: var(--beige-dark);
+}
 
-                            <!-- Логотип и название -->
-                            <div class="text-center mb-5">
-                                <div class="position-relative d-inline-block">
-                                    {% if object.logo %}
-                                        <img src="{{ object.logo.url }}" alt="Логотип" class="rounded"
-                                             style="width: 140px; height: 140px; object-fit: contain; border: 4px solid #e9ecef;">
-                                    {% else %}
-                                        <div class="bg-light rounded d-flex align-items-center justify-content-center"
-                                             style="width:140px;height:140px;border:4px solid #e9ecef;">
-                                            <i class="fas fa-building fa-3x text-muted"></i>
-                                        </div>
-                                    {% endif %}
-                                    <label class="btn btn-primary btn-sm position-absolute bottom-0 end-0 rounded-circle"
-                                           style="width:40px;height:40px;">
-                                        <i class="fas fa-camera"></i>
-                                        {{ form.logo }}
-                                    </label>
-                                </div>
-                                <h4 class="mt-3 fw-bold">{{ object.name }}</h4>
-                            </div>
+/* Кнопка загрузки логотипа */
+.logo-container label {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--beige-dark), var(--beige-light));
+    color: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+.logo-container label:hover {
+    background: linear-gradient(135deg, var(--gray-dark), var(--beige-dark));
+}
 
-                            <div class="row g-4">
-                                <div class="col-md-8">
-                                    <label class="form-label fw-semibold">Название компании *</label>
-                                    {{ form.name|add_class:"form-control form-control-lg" }}
-                                </div>
+/* Инпуты */
+.form-control {
+    border-radius: 12px;
+    border: 1px solid var(--beige-light);
+}
+.form-label {
+    font-weight: 600;
+}
 
-                                <div class="col-12">
-                                    <label class="form-label fw-semibold">О компании</label>
-                                    {{ form.description|add_class:"form-control"|attr:"rows:5"|attr:"placeholder:Расскажите о вашей компании, миссии, ценностях..." }}
-                                </div>
+/* Кнопки */
+.btn-success {
+    border-radius: 50px;
+    background: linear-gradient(135deg, var(--beige-dark), var(--beige-light));
+    color: var(--cream);
+    font-weight: 600;
+    box-shadow: 0 7px 20px rgba(164,147,134,0.5);
+    transition: all 0.3s ease;
+}
+.btn-success:hover {
+    background: linear-gradient(135deg, var(--gray-dark), var(--beige-dark));
+}
+.btn-secondary {
+    border-radius: 50px;
+}
+</style>
 
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Сайт компании</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-globe"></i></span>
-                                        {{ form.website|add_class:"form-control"|attr:"placeholder:https://example.com" }}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="card card-form border-0 shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Редактирование профиля компании</h4>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="history.back()">← Назад</button>
+                </div>
+                <div class="card-body p-5">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <!-- Логотип и название -->
+                        <div class="text-center mb-5">
+                            <div class="logo-container">
+                                {% if object.logo %}
+                                    <img src="{{ object.logo.url }}" alt="Логотип">
+                                {% else %}
+                                    <div class="fallback-logo">
+                                        {{ object.name|first|upper }}
                                     </div>
-                                </div>
+                                {% endif %}
+                                <label>
+                                    <i class="fas fa-camera"></i>
+                                    {{ form.logo }}
+                                </label>
+                            </div>
+                            <h4 class="mt-3 fw-bold">{{ object.name }}</h4>
+                        </div>
 
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Адрес</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
-                                        {{ form.address|add_class:"form-control"|attr:"placeholder:Бишкек, ул. Токтогула 123" }}
-                                    </div>
-                                </div>
+                        <div class="row g-4">
+                            <div class="col-md-8">
+                                <label class="form-label">Название компании *</label>
+                                {{ form.name|add_class:"form-control form-control-lg" }}
+                            </div>
 
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Год основания</label>
-                                    {{ form.founded_year|add_class:"form-control" }}
-                                </div>
+                            <div class="col-12">
+                                <label class="form-label">О компании</label>
+                                {{ form.description|add_class:"form-control"|attr:"rows:5"|attr:"placeholder:Расскажите о вашей компании, миссии, ценностях..." }}
+                            </div>
 
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Количество сотрудников</label>
-                                    {{ form.employees_count|add_class:"form-control"|attr:"placeholder:50" }}
+                            <div class="col-md-6">
+                                <label class="form-label">Сайт компании</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-globe"></i></span>
+                                    {{ form.website|add_class:"form-control"|attr:"placeholder:https://example.com" }}
                                 </div>
                             </div>
 
-                            <div class="mt-5 text-center">
-                                <button type="submit" class="btn btn-success btn-lg px-5">
-                                    Сохранить изменения
-                                </button>
-                                <button type="button" class="btn btn-secondary btn-lg ms-3" onclick="history.back()">
-                                    Отмена
-                                </button>
+                            <div class="col-md-6">
+                                <label class="form-label">Адрес</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                                    {{ form.address|add_class:"form-control"|attr:"placeholder:Бишкек, ул. Токтогула 123" }}
+                                </div>
                             </div>
-                        </form>
-                    </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Год основания</label>
+                                {{ form.founded_year|add_class:"form-control" }}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Количество сотрудников</label>
+                                {{ form.employees_count|add_class:"form-control"|attr:"placeholder:50" }}
+                            </div>
+                        </div>
+
+                        <div class="mt-5 text-center">
+                            <button type="submit" class="btn btn-success btn-lg px-5">Сохранить изменения</button>
+                            <button type="button" class="btn btn-secondary btn-lg ms-3" onclick="history.back()">Отмена</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
+</div>
 {% endblock %}

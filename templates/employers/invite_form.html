@@ -2,14 +2,65 @@
 {% block title %}Пригласить соискателя{% endblock %}
 
 {% block content %}
+<style>
+:root {
+    --beige-dark: #A49786;
+    --beige-light: #D9CBBF;
+    --cream: #F9F6EF;
+    --text-dark: #4B4A48;
+    --text-muted: #6F7375;
+}
+
+body {
+    background: var(--cream);
+    color: var(--text-dark);
+}
+
+/* Карточка приглашения */
+.card-invite {
+    border-radius: 20px;
+    background: var(--cream);
+    box-shadow: 0 10px 25px rgba(164,147,134,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card-invite:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(164,147,134,0.15);
+}
+
+/* Заголовок карточки */
+.card-invite .card-header {
+    border-radius: 20px 20px 0 0;
+    background: var(--beige-dark);
+    color: var(--cream);
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+/* Кнопки */
+.btn-success {
+    border-radius: 50px;
+    background: linear-gradient(135deg, var(--beige-dark), var(--beige-light));
+    color: var(--cream);
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+.btn-success:hover {
+    background: linear-gradient(135deg, var(--text-muted), var(--beige-dark));
+}
+.btn-outline-secondary {
+    border-radius: 50px;
+}
+</style>
+
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card border-0 shadow">
-                <div class="card-header bg-primary text-white text-center">
-                    <h4>Пригласить на вакансию</h4>
+            <div class="card card-invite border-0 shadow-sm">
+                <div class="card-header text-center">
+                    Пригласить на вакансию
                 </div>
-                <div class="card-body text-center">
+                <div class="card-body text-center p-5">
                     <div class="mb-4">
                         <h5 class="fw-bold">{{ jobseeker.user.get_full_name }}</h5>
                         <p class="text-muted">{{ jobseeker.desired_position|default:"Должность не указана" }}</p>
@@ -17,7 +68,7 @@
 
                     <form method="post">
                         {% csrf_token %}
-                        <div class="mb-4">
+                        <div class="mb-4 text-start">
                             <label class="form-label fw-bold">Выберите вакансию:</label>
                             <select name="vacancy" class="form-select form-select-lg" required>
                                 <option value="">— Выберите вакансию —</option>
@@ -29,7 +80,7 @@
 
                         <div class="d-grid gap-3">
                             <button type="submit" class="btn btn-success btn-lg">Отправить приглашение</button>
-                            <a href="javascript:history.back()" class="btn btn-outline-secondary">← Назад</a>
+                            <a href="javascript:history.back()" class="btn btn-outline-secondary btn-lg">← Назад</a>
                         </div>
                     </form>
                 </div>

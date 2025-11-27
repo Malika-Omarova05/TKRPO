@@ -7,6 +7,7 @@
 <div class="container py-5">
     <h1 class="fw-bold mb-4">Поиск резюме</h1>
 
+    <!-- Фильтр -->
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body">
             <form method="get" class="row g-3">
@@ -28,16 +29,15 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-2 d-flex gap-2">
                     <button type="submit" class="btn btn-primary w-100">Найти</button>
-                </div>
-                <div class="col-md-2">
                     <a href="{% url 'jobseekers:resume_list' %}" class="btn btn-outline-secondary w-100">Сбросить</a>
                 </div>
             </form>
         </div>
     </div>
 
+    <!-- Карточки резюме -->
     <div class="row g-4">
         {% for profile in profiles %}
         <div class="col-md-6 col-lg-4">

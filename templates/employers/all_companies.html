@@ -2,46 +2,189 @@
 {% block title %}Компании — Работа.kg{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <h1 class="fw-bold mb-5 text-center">Компании на Работа.kg</h1>
+
+<style>
+:root {
+    --gray-dark: #6F7375;
+    --gray-medium: #A7A9AC;
+    --beige-dark: #A49786;
+    --beige-light: #D9CBBF;
+    --cream: #F9F6EF;
+    --background: #FAF9F6;
+    --text-dark: #4B4A48;
+    --text-light: #9E9A90;
+}
+
+/* Контейнер */
+.page-wrapper {
+    padding: 60px 0;
+}
+
+/* Заголовок */
+.page-title {
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 40px;
+    color: var(--text-dark);
+}
+
+/* Поисковая панель */
+.search-box .input-group {
+    border-radius: 20px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 6px 20px rgba(164,147,134,0.25);
+}
+
+.search-box .form-control {
+    border: none;
+    padding: 14px 18px;
+}
+
+.search-btn {
+    background: linear-gradient(135deg, var(--beige-dark), var(--beige-light));
+    color: var(--cream);
+    font-weight: 600;
+    border: none;
+    padding: 0 24px;
+}
+.search-btn:hover {
+    background: linear-gradient(135deg, var(--gray-dark), var(--beige-dark));
+}
+
+/* Карточки компаний */
+.company-card {
+    background: var(--cream);
+    border-radius: 28px;
+    padding: 35px 25px;
+    text-align: center;
+    border: 1px solid rgba(164,147,134,0.25);
+    box-shadow: 0 14px 36px rgba(164,147,134,0.15);
+    transition: all 0.35s ease;
+    min-height: 260px;
+    position: relative;
+}
+.company-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 50px rgba(164,147,134,0.28);
+}
+
+/* Лого */
+.company-logo,
+.fallback-logo {
+    width: 110px;
+    height: 110px;
+    border-radius: 20px;
+    object-fit: contain;
+    margin-bottom: 15px;
+    background: #fff;
+    box-shadow: inset 0 0 12px rgba(0,0,0,0.06);
+}
+
+.fallback-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--beige-dark), var(--beige-light));
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: var(--cream);
+}
+
+/* Название */
+.company-card h5 {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-top: 10px;
+    font-size: 1.15rem;
+}
+
+/* Вакансии */
+.company-card p {
+    font-size: 0.9rem;
+    color: var(--gray-dark);
+}
+
+/* Анимация карточек */
+.fade-up {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s ease;
+}
+.fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+</style>
+
+<div class="container page-wrapper">
+
+    <h1 class="page-title">Компании на Работа.kg</h1>
 
     <!-- ПОИСК -->
-    <div class="row justify-content-center mb-4">
-        <div class="col-md-6">
-            <form method="get" class="d-flex">
-                <input type="text" name="search" class="form-control me-2" placeholder="Название компании..."
-                       value="{{ request.GET.search }}">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-search"></i>
-                </button>
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-7">
+            <form method="get" class="search-box">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-0">
+                        <i class="fas fa-search text-light"></i>
+                    </span>
+                    <input type="text"
+                           name="search"
+                           class="form-control"
+                           placeholder="Название компании..."
+                           value="{{ request.GET.search }}">
+                    <button type="submit" class="btn search-btn">Найти</button>
+                </div>
             </form>
         </div>
     </div>
 
+    <!-- СПИСОК КОМПАНИЙ -->
     <div class="row g-4">
         {% for company in companies %}
-        <div class="col-md-6 col-lg-4">
-            <a href="{% url 'employers:company_profile' company.id %}" class="text-decoration-none">
-                <div class="card border-0 shadow-sm text-center p-4 hover-shadow">
-                    {% if company.logo %}
-                        <img src="{{ company.logo.url }}" alt="{{ company.name }}" class="rounded mb-3" style="width: 100px; height: 100px; object-fit: contain;">
-                    {% else %}
-                        <div class="bg-primary text-white rounded d-flex align-items-center justify-content-center mb-3" style="width:100px;height:100px;margin:0 auto;font-size:2rem;">
-                            {{ company.name|first|upper }}
-                        </div>
-                    {% endif %}
-                    <h5 class="fw-bold text-dark mt-2">{{ company.name }}</h5>
-                    <p class="text-success small">
-                        {{ company.active_vacancies_count }} активных вакансий
-                    </p>
-                </div>
-            </a>
-        </div>
+            <div class="col-md-6 col-lg-4 fade-up">
+                <a href="{% url 'employers:company_profile' company.id %}"
+                   class="text-decoration-none">
+
+                    <div class="company-card">
+
+                        {% if company.logo %}
+                            <img src="{{ company.logo.url }}" class="company-logo" alt="{{ company.name }}">
+                        {% else %}
+                            <div class="fallback-logo">
+                                {{ company.name|first|upper }}
+                            </div>
+                        {% endif %}
+
+                        <h5>{{ company.name }}</h5>
+
+                        <p>{{ company.active_vacancies_count }} активных вакансий</p>
+                    </div>
+
+                </a>
+            </div>
+
         {% empty %}
-        <div class="col-12 text-center py-5">
-            <h4 class="text-muted">Компании не найдены</h4>
-        </div>
+            <div class="col-12 text-center py-5">
+                <h4 class="text-light">Компании не найдены</h4>
+            </div>
         {% endfor %}
     </div>
 </div>
+
+<script>
+/* Анимация появления карточек */
+const cards = document.querySelectorAll('.fade-up');
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+}, { threshold: 0.2 });
+
+cards.forEach(card => observer.observe(card));
+</script>
+
 {% endblock %}

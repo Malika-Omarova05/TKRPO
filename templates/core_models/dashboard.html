@@ -4,153 +4,299 @@
 {% block title %}Личный кабинет — Работа.kg{% endblock %}
 
 {% block content %}
-    <div class="container py-5">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-lg-3 mb-4">
-                <div class="card border-0 shadow-sm sticky-top" style="top: 1rem;">
-                    <div class="card-body text-center py-4">
-                        {% if user.avatar %}
-                            <img src="{{ user.avatar.url }}" alt="Аватар" class="rounded-circle mb-3" width="120"
-                                 height="120">
-                        {% else %}
-                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mb-3"
-                                 style="width:120px;height:120px;font-size:3rem;">
-                                {{ user.username|first|upper }}
-                            </div>
-                        {% endif %}
-                        <h5 class="fw-bold">{{ user.get_full_name|default:user.username }}</h5>
-                        <p class="text-muted mb-1">
-                            {{ role_name }}
-                        </p>
-                        <p class="text-muted small">{{ user.email }}</p>
-                    </div>
 
-                    <div class="list-group list-group-flush">
-                        <a href="{% url 'core:dashboard' %}" class="list-group-item list-group-item-action active">
-                            Обзор
-                        </a>
+<style>
+/* === ФИРМЕННАЯ ЦВЕТОВАЯ ПАЛИТРА === */
+:root {
+    --gray-dark: #6F7375;
+    --gray-medium: #A7A9AC;
+    --beige-dark: #A49786;
+    --beige-light: #D9CBBF;
+    --cream: #F9F6EF;
+    --background: #FAF9F6;
+    --text-dark: #4B4A48;
+    --text-light: #9E9A90;
+}
 
-                        {% if user.role == 'jobseeker' %}
-                            <a href="{% url 'jobseekers:cabinet' %}" class="list-group-item list-group-item-action">
-                                Моё резюме
-                            </a>
-                            <a href="{% url 'employers:all_vacancies' %}"
-                               class="list-group-item list-group-item-action">
-                                Поиск вакансий
-                            </a>
-                            <a href="{% url 'jobseekers:my_applications' %}"
-                               class="list-group-item list-group-item-action">
-                                Мои отклики
-                                {% if new_responses_count > 0 %}
-                                    <span class="badge bg-danger float-end">{{ new_responses_count }}</span>
-                                {% endif %}
-                            </a>
-                        {% elif user.role == 'employer' %}
-                            {% if user.company %}
-                                <a href="{% url 'employers:employer_cabinet' %}"
-                                   class="list-group-item list-group-item-action">
-                                    Профиль компании
-                                </a>
-                                <a href="{% url 'employers:vacancy_create' %}"
-                                   class="list-group-item list-group-item-action">
-                                    Создать вакансию
-                                </a>
-                                <a href="{% url 'employers:applications' %}"
-                                   class="list-group-item list-group-item-action">
-                                    Отклики
-                                    {% if new_applications > 0 %}
-                                        <span class="badge bg-danger float-end">{{ new_applications }}</span>
-                                    {% endif %}
-                                </a>
-                            {% else %}
-                                <a href="{% url 'employers:company_edit' %}"
-                                   class="list-group-item list-group-item-action text-warning">
-                                    Создать профиль компании
-                                </a>
-                            {% endif %}
-                        {% endif %}
+/* Общий фон */
+body {
+    background: var(--background);
+}
 
-                        <form method="post" action="{% url 'logout' %}" class="m-0">
-                            {% csrf_token %}
-                            <button type="submit"
-                                    class="list-group-item list-group-item-action text-danger border-0 bg-transparent text-start w-100 px-3 py-2">
-                                Выйти
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
+/* === Сайдбар === */
+.sidebar-card {
+    background: var(--cream);
+    border-radius: 24px;
+    padding-top: 25px;
+    padding-bottom: 20px;
+    box-shadow: 0 10px 30px rgba(164,147,134,0.25);
+}
 
-            <!-- Main Content -->
-            <div class="col-lg-9">
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-body p-5 text-center bg-gradient-primary text-white"
-                         style="border-radius: 1rem; background: linear-gradient(135deg, #6e8efb, #a777e3);">
-                        <h2 class="fw-bold">Добро пожаловать, {{ user.get_full_name|default:user.username }}!</h2>
-                        <p class="lead mb-0">
-                            {% if user.role == 'jobseeker' %}
-                                Готовы найти работу мечты? Начните с обновления резюме!
-                            {% elif user.role == 'employer' %}
-                                Ищете лучших кандидатов? Разместите вакансию прямо сейчас!
-                            {% endif %}
-                        </p>
-                    </div>
-                </div>
+.sidebar-card .list-group-item {
+    background: transparent;
+    color: var(--text-dark);
+    border: none;
+    padding: 14px 22px;
+    font-weight: 500;
+    border-radius: 12px;
+    transition: all .25s ease;
+}
 
-                <!-- Быстрые действия -->
-                <div class="row g-4 mb-5">
-                    {% if user.role == 'jobseeker' %}
-                        <div class="col-md-6">
-                            <div class="card h-100 border-0 shadow-sm text-center p-4 vacancy-card">
-                                <i class="fas fa-file-alt fa-4x text-primary mb-3"></i>
-                                <h5>Резюме</h5>
-                                <p class="text-muted">
-                                    {% if user.jobseeker_profile %}
-                                        Ваше резюме активно
-                                    {% else %}
-                                        Создайте резюме, чтобы начать поиск
-                                    {% endif %}
-                                </p>
-                                <a href="{% url 'jobseekers:cabinet' %}" class="btn btn-outline-primary">
-                                    {% if user.jobseeker_profile %}Редактировать{% else %}Создать{% endif %}
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card h-100 border-0 shadow-sm text-center p-4 vacancy-card">
-                                <i class="fas fa-search fa-4x text-success mb-3"></i>
-                                <h5>Поиск вакансий</h5>
-                                <p class="text-muted">Более {{ vacancies_count|default:"5000" }} актуальных вакансий</p>
-                                <a href="{% url 'employers:all_vacancies' %}" class="btn btn-success">
-                                    Найти работу
-                                </a>
-                            </div>
-                        </div>
-                    {% elif user.role == 'employer' %}
-                        <div class="col-md-6">
-                            <div class="card h-100 border-0 shadow-sm text-center p-4 vacancy-card">
-                                <i class="fas fa-plus-circle fa-4x text-primary mb-3"></i>
-                                <h5>Новая вакансия</h5>
-                                <a href="{% url 'employers:vacancy_create' %}" class="btn btn-primary mt-3">
-                                    Создать вакансию
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card h-100 border-0 shadow-sm text-center p-4 vacancy-card">
-                                <i class="fas fa-users fa-4x text-info mb-3"></i>
-                                <h5>Отклики</h5>
-                                <p class="text-muted">Новых откликов: <strong>{{ new_applications|default:0 }}</strong>
-                                </p>
-                                <a href="{% url 'employers:applications' %}" class="btn btn-info text-white mt-3">
-                                    Посмотреть
-                                </a>
-                            </div>
+.sidebar-card .list-group-item:hover {
+    background: var(--beige-light);
+    color: var(--cream);
+}
+
+.sidebar-card .active {
+    background: linear-gradient(135deg, var(--beige-dark), var(--beige-light));
+    color: var(--cream);
+    font-weight: 700;
+}
+
+/* avatar */
+.user-avatar {
+    background: var(--beige-light);
+    color: var(--cream);
+    border-radius: 50%;
+    width: 120px; height: 120px;
+    font-size: 3rem;
+    display: flex; align-items: center; justify-content: center;
+}
+
+/* === Welcome Card === */
+.dashboard-welcome {
+    border-radius: 28px;
+    padding: 55px 30px;
+    background: linear-gradient(135deg, var(--beige-light), var(--beige-dark));
+    color: var(--cream);
+    box-shadow: 0 12px 36px rgba(107,101,90,0.25);
+}
+
+/* === Dashboard Cards === */
+.dashboard-card {
+    background: var(--cream);
+    border-radius: 24px;
+    padding: 25px;
+    border: 1px solid rgba(164,147,134,0.25);
+    transition: all 0.3s ease;
+    box-shadow: 0 12px 30px rgba(164,147,134,0.15);
+}
+
+.dashboard-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 45px rgba(164,147,134,0.25);
+    background: var(--beige-light);
+    color: var(--cream);
+}
+
+/* Иконки быстрого действия */
+.quick-action-icon {
+    font-size: 3rem;
+    margin-bottom: 14px;
+    color: var(--beige-dark);
+}
+
+.dashboard-card:hover .quick-action-icon {
+    color: var(--cream);
+}
+
+/* Кнопки */
+.btn-beige {
+    background: linear-gradient(135deg, var(--beige-dark), var(--beige-light));
+    border: none;
+    color: var(--cream) !important;
+    font-weight: 600;
+    border-radius: 50px;
+    padding: 10px 28px;
+    box-shadow: 0 10px 25px rgba(164,147,134,0.5);
+    transition: all .3s ease;
+}
+
+.btn-beige:hover {
+    background: linear-gradient(135deg, var(--beige-light), var(--cream));
+    color: var(--text-dark) !important;
+}
+
+/* Fade animation */
+.fade-in-down {
+    opacity: 0;
+    transform: translateY(-25px);
+    animation: fadeInDown .8s forwards;
+}
+
+@keyframes fadeInDown {
+    to { opacity:1; transform: translateY(0); }
+}
+</style>
+
+
+<div class="container py-5 fade-in-down">
+
+    <div class="row">
+
+        <!-- SIDEBAR -->
+        <div class="col-lg-3 mb-4">
+            <div class="sidebar-card sticky-top" style="top:1rem;">
+
+                <div class="text-center mb-3">
+                    {% if user.avatar %}
+                        <img src="{{ user.avatar.url }}" class="rounded-circle mb-3"
+                             width="120" height="120">
+                    {% else %}
+                        <div class="user-avatar mb-3">
+                            {{ user.username|first|upper }}
                         </div>
                     {% endif %}
+
+                    <h5 class="fw-bold text-dark">{{ user.get_full_name|default:user.username }}</h5>
+                    <p class="text-light mb-1" style="color:var(--text-light) !important;">{{ role_name }}</p>
+                    <p class="small" style="color:var(--text-light) !important;">{{ user.email }}</p>
+                </div>
+
+                <div class="list-group list-group-flush px-3">
+
+                    <a href="{% url 'core:dashboard' %}"
+                       class="list-group-item list-group-item-action active">
+                        Обзор
+                    </a>
+
+                    {% if user.role == 'jobseeker' %}
+                        <a href="{% url 'jobseekers:cabinet' %}"
+                           class="list-group-item list-group-item-action">
+                            Моё резюме
+                        </a>
+
+                        <a href="{% url 'employers:all_vacancies' %}"
+                           class="list-group-item list-group-item-action">
+                            Поиск вакансий
+                        </a>
+
+                        <a href="{% url 'jobseekers:my_applications' %}"
+                           class="list-group-item list-group-item-action">
+                            Мои отклики
+                            {% if new_responses_count > 0 %}
+                                <span class="badge bg-danger float-end">{{ new_responses_count }}</span>
+                            {% endif %}
+                        </a>
+
+                    {% elif user.role == 'employer' %}
+
+                        {% if user.company %}
+                            <a href="{% url 'employers:employer_cabinet' %}"
+                               class="list-group-item list-group-item-action">
+                                Профиль компании
+                            </a>
+
+                            <a href="{% url 'employers:vacancy_create' %}"
+                               class="list-group-item list-group-item-action">
+                                Создать вакансию
+                            </a>
+
+                            <a href="{% url 'employers:applications' %}"
+                               class="list-group-item list-group-item-action">
+                                Отклики
+                                {% if new_applications > 0 %}
+                                    <span class="badge bg-danger float-end">{{ new_applications }}</span>
+                                {% endif %}
+                            </a>
+                        {% else %}
+                            <a href="{% url 'employers:company_edit' %}"
+                               class="list-group-item list-group-item-action text-warning">
+                                Создать профиль компании
+                            </a>
+                        {% endif %}
+                    {% endif %}
+
+                    <form method="post" action="{% url 'logout' %}" class="m-0">
+                        {% csrf_token %}
+                        <button type="submit"
+                                class="list-group-item list-group-item-action text-danger text-start bg-transparent border-0 px-0 py-2">
+                            Выйти
+                        </button>
+                    </form>
+
                 </div>
             </div>
         </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="col-lg-9">
+
+            <!-- Welcome Card -->
+            <div class="dashboard-welcome mb-4">
+                <h2 class="fw-bold mb-3">
+                    Добро пожаловать, {{ user.get_full_name|default:user.username }}!
+                </h2>
+
+                <p class="lead mb-0">
+                    {% if user.role == 'jobseeker' %}
+                        Готовы найти работу мечты? Начните с обновления резюме!
+                    {% elif user.role == 'employer' %}
+                        Ищете лучших кандидатов? Разместите вакансию прямо сейчас!
+                    {% endif %}
+                </p>
+            </div>
+
+            <!-- Quick actions -->
+            <div class="row g-4">
+
+                {% if user.role == 'jobseeker' %}
+                <div class="col-md-6">
+                    <div class="dashboard-card text-center h-100">
+                        <i class="fas fa-file-alt quick-action-icon"></i>
+                        <h5 class="fw-bold text-dark">Резюме</h5>
+                        <p class="text-light" style="color:var(--text-light)!important;">
+                            {% if user.jobseeker_profile %}
+                                Ваше резюме активно
+                            {% else %}
+                                Создайте резюме, чтобы начать поиск
+                            {% endif %}
+                        </p>
+                        <a href="{% url 'jobseekers:cabinet' %}" class="btn-beige">
+                            {% if user.jobseeker_profile %}Редактировать{% else %}Создать{% endif %}
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="dashboard-card text-center h-100">
+                        <i class="fas fa-search quick-action-icon"></i>
+                        <h5 class="fw-bold text-dark">Поиск вакансий</h5>
+                        <p style="color:var(--text-light)!important;">Более {{ vacancies_count|default:"5000" }} вакансий</p>
+                        <a href="{% url 'employers:all_vacancies' %}" class="btn-beige">
+                            Найти работу
+                        </a>
+                    </div>
+                </div>
+
+                {% elif user.role == 'employer' %}
+                <div class="col-md-6">
+                    <div class="dashboard-card text-center h-100">
+                        <i class="fas fa-plus-circle quick-action-icon"></i>
+                        <h5 class="fw-bold text-dark">Новая вакансия</h5>
+                        <a href="{% url 'employers:vacancy_create' %}" class="btn-beige mt-3">
+                            Создать вакансию
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="dashboard-card text-center h-100">
+                        <i class="fas fa-users quick-action-icon"></i>
+                        <h5 class="fw-bold text-dark">Отклики</h5>
+                        <p style="color:var(--text-light)!important;">
+                            Новых откликов: <strong>{{ new_applications|default:0 }}</strong>
+                        </p>
+                        <a href="{% url 'employers:applications' %}" class="btn-beige mt-3">
+                            Посмотреть
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
     </div>
+</div>
+
 {% endblock %}

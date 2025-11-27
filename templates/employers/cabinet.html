@@ -4,33 +4,173 @@
 {% block title %}Кабинет работодателя — {{ company.name }}{% endblock %}
 
 {% block content %}
+<style>
+:root {
+    --beige-dark: #A49786;
+    --beige-light: #D9CBBF;
+    --cream: #F9F6EF;
+    --gray-dark: #6F7375;
+    --text-dark: #4B4A48;
+    --text-light: #9E9A90;
+    --bg-light: #FAF9F6;
+}
+
+/* Общие стили */
+body {
+    background: var(--bg-light);
+    color: var(--text-dark);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Sidebar */
+.sidebar-card {
+    background: var(--cream);
+    border-radius: 24px;
+    box-shadow: 0 10px 25px rgba(107,101,90,0.1);
+    padding: 25px 15px;
+    position: sticky;
+    top: 1rem;
+}
+
+.sidebar-card img,
+.sidebar-card .fallback-logo {
+    width: 110px;
+    height: 110px;
+    border-radius: 16px;
+    object-fit: contain;
+    margin: 0 auto 15px;
+}
+
+.fallback-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    background-color: var(--beige-dark);
+    color: var(--cream);
+}
+
+.sidebar-card h5 {
+    margin-top: 10px;
+    font-weight: 700;
+}
+
+.sidebar-card p {
+    font-size: 0.875rem;
+    color: var(--gray-dark);
+}
+
+.sidebar-card .btn {
+    margin-top: 1rem;
+    border-radius: 50px;
+    background: linear-gradient(135deg, var(--beige-dark), var(--beige-light));
+    color: var(--cream);
+    font-weight: 600;
+    box-shadow: 0 7px 20px rgba(164,147,134,0.6);
+    transition: all 0.3s ease;
+}
+.sidebar-card .btn:hover {
+    background: linear-gradient(135deg, var(--gray-dark), var(--beige-dark));
+}
+
+.list-group-item {
+    border-radius: 12px;
+    margin-bottom: 0.3rem;
+    transition: all 0.3s ease;
+}
+.list-group-item.active {
+    background: var(--beige-dark);
+    border-color: var(--beige-dark);
+    color: var(--cream);
+}
+.list-group-item:hover {
+    background: var(--beige-light);
+}
+
+/* Основная часть */
+.card-section {
+    background: var(--cream);
+    border-radius: 24px;
+    box-shadow: 0 10px 25px rgba(107,101,90,0.1);
+    margin-bottom: 30px;
+    padding: 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card-section:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(107,101,90,0.15);
+}
+
+/* Статистика */
+.stat-card {
+    border-radius: 24px;
+    background: var(--cream);
+    text-align: center;
+    padding: 25px;
+    box-shadow: 0 10px 25px rgba(107,101,90,0.1);
+    transition: all 0.3s ease;
+}
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(107,101,90,0.15);
+}
+.stat-card i {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+/* Вакансии */
+.vacancy-card {
+    border-radius: 20px;
+    background: var(--cream);
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 10px 25px rgba(107,101,90,0.05);
+    transition: all 0.3s ease;
+}
+.vacancy-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(107,101,90,0.1);
+}
+.vacancy-card h6 a {
+    text-decoration: none;
+    color: var(--text-dark);
+}
+.vacancy-card h6 a:hover {
+    text-decoration: underline;
+}
+.vacancy-badge {
+    border-radius: 50px;
+    padding: 5px 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* Hover для списка вакансий */
+.hover-bg-light:hover {
+    background-color: var(--bg-light);
+}
+</style>
+
 <div class="container py-5">
     <div class="row">
         <!-- Sidebar -->
         <div class="col-lg-3 mb-4">
-            <div class="card border-0 shadow-sm sticky-top" style="top: 1rem;">
-                <div class="card-body text-center py-4">
-                    <!-- Логотип -->
-                    {% if company.logo %}
-                        <img src="{{ company.logo.url }}" alt="{{ company.name }}" class="rounded mb-3" style="width: 110px; height: 110px; object-fit: contain; border: 3px solid #e9ecef;">
-                    {% else %}
-                        <div class="bg-primary text-white rounded d-flex align-items-center justify-content-center mb-3" style="width:110px; height:110px; font-size:2.5rem; border: 3px solid #e9ecef;">
-                            {{ company.name|first|upper }}
-                        </div>
-                    {% endif %}
+            <div class="sidebar-card text-center">
+                {% if company.logo %}
+                    <img src="{{ company.logo.url }}" alt="{{ company.name }}">
+                {% else %}
+                    <div class="fallback-logo">{{ company.name|first|upper }}</div>
+                {% endif %}
 
-                    <!-- Название и email -->
-                    <h5 class="fw-bold mt-3">{{ company.name }}</h5>
-                    <p class="text-muted small">{{ company.user.email }}</p>
+                <h5>{{ company.name }}</h5>
+                <p>{{ company.user.email }}</p>
 
-                    <!-- КНОПКА РЕДАКТИРОВАТЬ — САМАЯ ВАЖНАЯ! -->
-                    <a href="{% url 'employers:company_edit' %}" class="btn btn-primary w-100 mt-3">
-                        <i class="fas fa-edit me-2"></i> Редактировать профиль компании
-                    </a>
-                </div>
+                <a href="{% url 'employers:company_edit' %}" class="btn w-100">
+                    <i class="fas fa-edit me-2"></i> Редактировать профиль
+                </a>
 
-                <!-- Навигация -->
-                <div class="list-group list-group-flush">
+                <div class="list-group list-group-flush mt-4">
                     <a href="{% url 'employers:employer_cabinet' %}" class="list-group-item list-group-item-action active">
                         <i class="fas fa-tachometer-alt me-2"></i> Обзор
                     </a>
@@ -43,12 +183,9 @@
                             <span class="badge bg-danger ms-2">{{ new_applications }}</span>
                         {% endif %}
                     </a>
-                    <a href="{% url 'employers:company_profile' company.id %}"
-   target="_blank"
-   class="btn btn-success w-100 mt-3">
-    <i class="fas fa-external-link-alt me-2"></i>
-    Открыть публичный профиль
-</a>
+                    <a href="{% url 'employers:company_profile' company.id %}" target="_blank" class="btn btn-success w-100 mt-3">
+                        <i class="fas fa-external-link-alt me-2"></i> Публичный профиль
+                    </a>
                 </div>
             </div>
         </div>
@@ -60,84 +197,71 @@
             <!-- Статистика -->
             <div class="row g-4 mb-5">
                 <div class="col-md-4">
-                    <div class="card text-center border-0 shadow-sm h-100">
-                        <div class="card-body">
-                            <i class="fas fa-briefcase fa-3x text-primary mb-3"></i>
-                            <h4 class="fw-bold">{{ vacancies.count }}</h4>
-                            <p class="text-muted">Активных вакансий</p>
-                        </div>
+                    <div class="stat-card">
+                        <i class="fas fa-briefcase text-primary"></i>
+                        <h4 class="fw-bold">{{ vacancies.count }}</h4>
+                        <p class="text-muted">Активных вакансий</p>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="card text-center border-0 shadow-sm h-100">
-                        <div class="card-body">
-                            <i class="fas fa-paper-plane fa-3x text-success mb-3"></i>
-                            <h4 class="fw-bold">{{ total_applications }}</h4>
-                            <p class="text-muted">Всего откликов</p>
-                        </div>
+                    <div class="stat-card">
+                        <i class="fas fa-paper-plane text-success"></i>
+                        <h4 class="fw-bold">{{ total_applications }}</h4>
+                        <p class="text-muted">Всего откликов</p>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="card text-center border-0 shadow-sm h-100">
-                        <div class="card-body">
-                            <i class="fas fa-bell fa-3x text-warning mb-3"></i>
-                            <h4 class="fw-bold">{{ new_applications }}</h4>
-                            <p class="text-muted">Новых откликов</p>
-                            <a href="{% url 'employers:applications' %}" class="btn btn-warning btn-sm mt-2">Посмотреть</a>
-                        </div>
+                    <div class="stat-card">
+                        <i class="fas fa-bell text-warning"></i>
+                        <h4 class="fw-bold">{{ new_applications }}</h4>
+                        <p class="text-muted">Новых откликов</p>
+                        <a href="{% url 'employers:applications' %}" class="btn btn-warning btn-sm mt-2">Посмотреть</a>
                     </div>
                 </div>
             </div>
 
-            <!-- Список вакансий -->
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="fas fa-list me-2"></i> Ваши вакансии</h5>
+            <!-- Вакансии -->
+            <div class="card-section">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5><i class="fas fa-list me-2"></i> Ваши вакансии</h5>
                     <a href="{% url 'employers:vacancy_create' %}" class="btn btn-success btn-sm">
                         <i class="fas fa-plus"></i> Новая вакансия
                     </a>
                 </div>
-                <div class="card-body p-0">
-                    {% for vacancy in vacancies %}
-                        <div class="border-bottom p-3 d-flex justify-content-between align-items-center hover-bg-light">
-                            <div>
-                                <h6 class="fw-bold mb-1">
-                                    <a href="{% url 'employers:vacancy_detail' vacancy.pk %}" class="text-decoration-none text-dark">
-                                        {{ vacancy.title }}
-                                    </a>
-                                </h6>
-                                <small class="text-muted">
-                                    <i class="fas fa-map-marker-alt"></i> {{ vacancy.location }}
-                                    {% if vacancy.salary_from %}
-                                        • от {{ vacancy.salary_from|floatformat:0 }} сом
-                                    {% endif %}
-                                </small>
-                            </div>
-                            <div class="text-end">
-                                <span class="badge bg-{% if vacancy.is_active %}success{% else %}secondary{% endif %} fs-6">
-                                    {% if vacancy.is_active %}Активна{% else %}Закрыта{% endif %}
-                                </span>
-                                <div class="btn-group mt-2">
-                                    <a href="{% url 'employers:vacancy_edit' vacancy.pk %}" class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <a href="{% url 'employers:vacancy_delete' vacancy.pk %}" class="btn btn-sm btn-outline-danger"
-                                       onclick="return confirm('Удалить вакансию «{{ vacancy.title }}»?')">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
-                                </div>
+
+                {% for vacancy in vacancies %}
+                    <div class="vacancy-card d-flex justify-content-between align-items-center hover-bg-light">
+                        <div>
+                            <h6><a href="{% url 'employers:vacancy_detail' vacancy.pk %}">{{ vacancy.title }}</a></h6>
+                            <small class="text-muted">
+                                <i class="fas fa-map-marker-alt"></i> {{ vacancy.location }}
+                                {% if vacancy.salary_from %}• от {{ vacancy.salary_from|floatformat:0 }} сом{% endif %}
+                            </small>
+                        </div>
+                        <div class="text-end">
+                            <span class="vacancy-badge bg-{% if vacancy.is_active %}success{% else %}secondary{% endif %}">
+                                {% if vacancy.is_active %}Активна{% else %}Закрыта{% endif %}
+                            </span>
+                            <div class="btn-group mt-2">
+                                <a href="{% url 'employers:vacancy_edit' vacancy.pk %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'employers:vacancy_delete' vacancy.pk %}" class="btn btn-sm btn-outline-danger"
+                                   onclick="return confirm('Удалить вакансию «{{ vacancy.title }}»?')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
                             </div>
                         </div>
-                    {% empty %}
-                        <div class="p-5 text-center text-muted">
-                            <i class="fas fa-briefcase fa-4x mb-3 text-muted"></i>
-                            <p>У вас пока нет вакансий</p>
-                            <a href="{% url 'employers:vacancy_create' %}" class="btn btn-success">
-                                <i class="fas fa-plus"></i> Создать первую вакансию
-                            </a>
-                        </div>
-                    {% endfor %}
-                </div>
+                    </div>
+                {% empty %}
+                    <div class="text-center py-5 text-muted">
+                        <i class="fas fa-briefcase fa-4x mb-3"></i>
+                        <p>У вас пока нет вакансий</p>
+                        <a href="{% url 'employers:vacancy_create' %}" class="btn btn-success">
+                            <i class="fas fa-plus"></i> Создать первую вакансию
+                        </a>
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>

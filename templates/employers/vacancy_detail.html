@@ -1,14 +1,66 @@
 {% extends "base.html" %}
-{% load static %}
-
 {% block title %}{{ vacancy.title }} — Вакансия{% endblock %}
 
 {% block content %}
+<style>
+:root {
+    --beige-dark: #A49786;
+    --beige-light: #D9CBBF;
+    --cream: #F9F6EF;
+    --text-dark: #4B4A48;
+    --text-muted: #6F7375;
+}
+
+/* Общие стили страницы */
+body {
+    background: var(--cream);
+    color: var(--text-dark);
+}
+
+/* Карточка вакансии */
+.card-vacancy {
+    border-radius: 20px;
+    background: var(--cream);
+    box-shadow: 0 10px 25px rgba(164,147,134,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card-vacancy:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(164,147,134,0.15);
+}
+
+/* Заголовки секций */
+.card-vacancy h5 {
+    font-weight: 600;
+    color: var(--beige-dark);
+}
+
+/* Блок зарплаты */
+.alert-salary {
+    background: var(--beige-light);
+    color: var(--text-dark);
+    font-weight: 500;
+}
+
+/* Кнопки отклика */
+.btn-success {
+    border-radius: 50px;
+    background: linear-gradient(135deg, var(--beige-dark), var(--beige-light));
+    color: var(--cream);
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+.btn-success:hover {
+    background: linear-gradient(135deg, var(--text-muted), var(--beige-dark));
+}
+</style>
+
 <div class="container py-5">
     <div class="row">
         <div class="col-lg-9 mx-auto">
-            <div class="card border-0 shadow-sm">
+            <div class="card card-vacancy border-0 shadow-sm">
                 <div class="card-body p-5">
+                    <!-- Заголовок и статус -->
                     <div class="d-flex justify-content-between align-items-start mb-4">
                         <div>
                             <h2 class="fw-bold">{{ vacancy.title }}</h2>
@@ -21,14 +73,16 @@
                         </span>
                     </div>
 
+                    <!-- Зарплата -->
                     {% if vacancy.salary_from or vacancy.salary_to %}
-                        <div class="alert alert-success">
+                        <div class="alert alert-salary py-2 px-3 rounded">
                             <strong>Зарплата:</strong>
                             {% if vacancy.salary_from %}от {{ vacancy.salary_from|floatformat:0 }} сом{% endif %}
                             {% if vacancy.salary_to %} до {{ vacancy.salary_to|floatformat:0 }} сом{% endif %}
                         </div>
                     {% endif %}
 
+                    <!-- Доп. информация -->
                     <div class="row mt-4">
                         <div class="col-md-6">
                             <p><strong>Категория:</strong> {{ vacancy.category }}</p>
@@ -39,6 +93,7 @@
 
                     <hr>
 
+                    <!-- Описание и требования -->
                     <h5>Описание</h5>
                     <p class="lead">{{ vacancy.description|linebreaks }}</p>
 
@@ -50,7 +105,7 @@
                         <p>{{ vacancy.responsibilities|linebreaks }}</p>
                     {% endif %}
 
-                    <!-- БОЛЬШАЯ КНОПКА ОТКЛИКА -->
+                    <!-- Кнопка отклика для соискателя -->
                     {% if user.is_authenticated and user.role == 'jobseeker' %}
                         <div class="text-center mt-5 py-5 border-top">
                             {% if vacancy.already_applied %}
@@ -68,14 +123,13 @@
                         </div>
                     {% endif %}
 
-                    <!-- КНОПКИ ДЛЯ РАБОТОДАТЕЛЯ -->
+                    <!-- Кнопки для работодателя -->
                     {% if user.is_authenticated and vacancy.company.user == user %}
                         <div class="mt-5 text-end border-top pt-4">
                             <a href="{% url 'employers:vacancy_edit' vacancy.pk %}" class="btn btn-primary">
                                 Редактировать
                             </a>
-                            <a href="{% url 'employers:vacancy_delete' vacancy.pk %}"
-                               class="btn btn-outline-danger ms-2"
+                            <a href="{% url 'employers:vacancy_delete' vacancy.pk %}" class="btn btn-outline-danger ms-2"
                                onclick="return confirm('Удалить вакансию?');">
                                 Удалить
                             </a>
@@ -83,7 +137,7 @@
                     {% endif %}
 
                     <div class="mt-4 text-end">
-                        <button type="button" class="btn btn-secondary" onclick="history.back()">
+                        <button type="button" class="btn btn-outline-secondary" onclick="history.back()">
                             ← Назад
                         </button>
                     </div>

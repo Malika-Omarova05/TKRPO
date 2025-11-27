@@ -7,17 +7,17 @@
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white">
-                    <h4 class="mb-0">Добавить опыт работы</h4>
+            <div class="card border-0 shadow-sm" style="border-radius: 15px; background-color: #fdf8f2;">
+                <div class="card-header" style="background-color: #f5efe6; border-radius: 15px 15px 0 0;">
+                    <h4 class="mb-0 fw-bold text-dark">Добавить опыт работы</h4>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-5">
                     <form method="post">
                         {% csrf_token %}
 
-                        <!-- Показываем ошибки формы -->
+                        <!-- Ошибки формы -->
                         {% if form.errors %}
-                            <div class="alert alert-danger">
+                            <div class="alert alert-danger mb-4">
                                 <ul class="mb-0">
                                     {% for field in form %}
                                         {% for error in field.errors %}
@@ -31,41 +31,46 @@
                             </div>
                         {% endif %}
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Компания *</label>
-                            {{ form.company|add_class:"form-control"|attr:"required" }}
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Компания *</label>
+                            {{ form.company|add_class:"form-control form-control-lg"|attr:"placeholder:Название компании|required" }}
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Должность *</label>
-                            {{ form.position|add_class:"form-control"|attr:"required" }}
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Должность *</label>
+                            {{ form.position|add_class:"form-control form-control-lg"|attr:"placeholder:Менеджер по продажам|required" }}
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Описание обязанностей</label>
-                            {{ form.description|add_class:"form-control"|attr:"rows:5" }}
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Описание обязанностей</label>
+                            {{ form.description|add_class:"form-control"|attr:"rows:5"|attr:"placeholder:Опишите ваши обязанности" }}
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Дата начала *</label>
-                                {{ form.start_date|add_class:"form-control"|attr:"type:date"|attr:"required" }}
+                        <!-- Даты работы -->
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Дата начала *</label>
+                                <input type="date" class="form-control form-control-lg" id="id_start_date_input" required>
+                                <input type="hidden" name="start_date" id="id_start_date">
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Дата окончания</label>
-                                {{ form.end_date|add_class:"form-control"|attr:"type:date" }}
-                                <small class="text-muted">Оставьте пустым, если работаете сейчас</small>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Дата окончания</label>
+                                <input type="date" class="form-control form-control-lg" id="id_end_date_input">
+                                <input type="hidden" name="end_date" id="id_end_date">
+                                <small class="text-muted d-block">Оставьте пустым, если работаете сейчас</small>
                             </div>
                         </div>
 
                         <div class="form-check mb-4">
                             {{ form.is_current|add_class:"form-check-input" }}
-                            <label class="form-check-label fw-bold">Работаю в настоящее время</label>
+                            <label class="form-check-label fw-semibold">Работаю в настоящее время</label>
                         </div>
 
                         <div class="text-end">
-                            <a href="{% url 'jobseekers:cabinet' %}" class="btn btn-secondary px-4">Отмена</a>
-                            <button type="submit" class="btn btn-success px-5 ms-2">Сохранить</button>
+                            <a href="{% url 'jobseekers:cabinet' %}" class="btn btn-outline-secondary btn-lg px-4">Отмена</a>
+                            <button type="submit" class="btn btn-success btn-lg px-5 ms-3" style="background: linear-gradient(135deg, #A49786, #D9CBBF); border:none; color:#fdf8f2;">
+                                Сохранить
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -73,4 +78,35 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const startInput = document.getElementById('id_start_date_input');
+    const endInput = document.getElementById('id_end_date_input');
+    const startHidden = document.getElementById('id_start_date');
+    const endHidden = document.getElementById('id_end_date');
+    const isCurrent = document.querySelector('[name="is_current"]');
+
+    function updateDates() {
+        startHidden.value = startInput.value || '';
+        endHidden.value = endInput.value || '';
+        if(isCurrent.checked){
+            endInput.value = '';
+            endInput.disabled = true;
+            endHidden.value = '';
+        } else {
+            endInput.disabled = false;
+        }
+    }
+
+    startInput.addEventListener('change', updateDates);
+    endInput.addEventListener('change', updateDates);
+    if(isCurrent){
+        isCurrent.addEventListener('change', updateDates);
+        updateDates();
+    }
+
+    document.querySelector('form').addEventListener('submit', updateDates);
+});
+</script>
 {% endblock %}

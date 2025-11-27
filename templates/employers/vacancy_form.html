@@ -6,69 +6,106 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-10">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white">
-                        <h4 class="mb-0">
-                            {% if object %}Редактировать вакансию{% else %}Новая вакансия{% endif %}
-                        </h4>
-                    </div>
-                    <div class="card-body p-5">
-                        <form method="post" enctype="multipart/form-data">
-                            {% csrf_token %}
+<style>
+:root {
+    --beige-dark: #A49786;
+    --beige-light: #D9CBBF;
+    --cream: #F9F6EF;
+    --text-dark: #4B4A48;
+    --text-muted: #6F7375;
+}
 
-                            <div class="row g-4">
-                                <div class="col-md-8">
-                                    <label class="form-label fw-bold">Должность *</label>
-                                    {{ form.title|add_class:"form-control form-control-lg"|attr:"placeholder:Менеджер по продажам" }}
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label fw-bold">Город *</label>
-                                    {{ form.location|add_class:"form-control"|attr:"placeholder:Бишкек" }}
-                                </div>
+body {
+    background: var(--cream);
+    color: var(--text-dark);
+}
 
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Категория</label>
-                                    {{ form.category|add_class:"form-select" }}
-                                </div>
+.card-vacancy-form {
+    border-radius: 20px;
+    background: var(--cream);
+    box-shadow: 0 10px 25px rgba(164,147,134,0.1);
+}
 
-                                <div class="col-md-3">
-                                    <label class="form-label fw-bold">Зарплата от</label>
-                                    {{ form.salary_from|add_class:"form-control"|attr:"placeholder:40 000" }}
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label fw-bold">Зарплата до</label>
-                                    {{ form.salary_to|add_class:"form-control"|attr:"placeholder:80 000" }}
-                                </div>
+.card-vacancy-form .form-control,
+.card-vacancy-form .form-select {
+    border-radius: 10px;
+}
 
-                                <div class="col-12">
-                                    <label class="form-label fw-bold">Описание вакансии *</label>
-                                    {{ form.description|add_class:"form-control"|attr:"rows:6" }}
-                                </div>
+.btn-success {
+    border-radius: 50px;
+    background: linear-gradient(135deg, var(--beige-dark), var(--beige-light));
+    color: var(--cream);
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
 
-                                <div class="col-12">
-                                    <label class="form-label fw-bold">Требования *</label>
-                                    {{ form.requirements|add_class:"form-control"|attr:"rows:5" }}
-                                </div>
+.btn-success:hover {
+    background: linear-gradient(135deg, var(--text-muted), var(--beige-dark));
+}
+</style>
 
-                                <div class="col-12">
-                                    <label class="form-label fw-bold">Обязанности</label>
-                                    {{ form.responsibilities|add_class:"form-control"|attr:"rows:5" }}
-                                </div>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card card-vacancy-form border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h4 class="mb-0">
+                        {% if object %}Редактировать вакансию{% else %}Новая вакансия{% endif %}
+                    </h4>
+                </div>
+                <div class="card-body p-5">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
 
-                                <div class="col-12">
-                                    <div class="form-check">
-                                        {{ form.is_active|add_class:"form-check-input" }}
-                                        <label class="form-check-label">Вакансия активна (видна соискателям)</label>
-                                    </div>
+                        <div class="row g-4">
+                            <div class="col-md-8">
+                                <label class="form-label fw-bold">Должность *</label>
+                                {{ form.title|add_class:"form-control form-control-lg"|attr:"placeholder:Менеджер по продажам" }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Город *</label>
+                                {{ form.location|add_class:"form-control"|attr:"placeholder:Бишкек" }}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Категория</label>
+                                {{ form.category|add_class:"form-select" }}
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Зарплата от</label>
+                                {{ form.salary_from|add_class:"form-control"|attr:"placeholder:40 000" }}
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Зарплата до</label>
+                                {{ form.salary_to|add_class:"form-control"|attr:"placeholder:80 000" }}
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Описание вакансии *</label>
+                                {{ form.description|add_class:"form-control"|attr:"rows:6" }}
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Требования *</label>
+                                {{ form.requirements|add_class:"form-control"|attr:"rows:5" }}
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Обязанности</label>
+                                {{ form.responsibilities|add_class:"form-control"|attr:"rows:5" }}
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-check">
+                                    {{ form.is_active|add_class:"form-check-input" }}
+                                    <label class="form-check-label">Вакансия активна (видна соискателям)</label>
                                 </div>
                             </div>
 
                             <div class="col-12">
                                 <label class="form-label fw-bold">Требуемые навыки</label>
-                                <div class="border rounded p-3 bg-light" style="max-height: 300px; overflow-y: auto;">
+                                <div class="border rounded p-3" style="max-height: 300px; overflow-y: auto; background: var(--beige-light);">
                                     <div class="row">
                                         {% for skill in form.skills %}
                                             <div class="col-md-4 col-sm-6 mb-2">
@@ -84,18 +121,18 @@
                                 </div>
                                 <small class="text-muted">Выберите все необходимые навыки</small>
                             </div>
+                        </div>
 
-                            <div class="mt-5 text-end">
-                                <a href="{% url 'employers:employer_cabinet' %}"
-                                   class="btn btn-secondary btn-lg">Отмена</a>
-                                <button type="submit" class="btn btn-success btn-lg ms-3 px-5">
-                                    {% if object %}Сохранить{% else %}Опубликовать{% endif %}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                        <div class="mt-5 text-end">
+                            <a href="{% url 'employers:employer_cabinet' %}" class="btn btn-secondary btn-lg">Отмена</a>
+                            <button type="submit" class="btn btn-success btn-lg ms-3 px-5">
+                                {% if object %}Сохранить{% else %}Опубликовать{% endif %}
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
+</div>
 {% endblock %}

@@ -11,7 +11,7 @@
                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
                     <h4 class="mb-0">Редактировать резюме</h4>
                     <button type="button" onclick="history.back()" class="btn btn-outline-secondary btn-sm">
-                        Назад
+                        ← Назад
                     </button>
                 </div>
                 <div class="card-body">
@@ -30,10 +30,10 @@
 
                         <div class="mb-4">
                             <label class="form-label fw-bold">Желаемая должность *</label>
-                            {{ form.desired_position|add_class:"form-control form-control-lg" }}
+                            {{ form.desired_position|add_class:"form-control form-control-lg"|attr:"placeholder:Менеджер по продажам" }}
                         </div>
 
-                        <div class="row g-3">
+                        <div class="row g-3 mb-4">
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Зарплата от</label>
                                 <div class="input-group">
@@ -50,19 +50,19 @@
                             </div>
                         </div>
 
-                        <div class="my-4">
+                        <div class="mb-4">
                             <label class="form-label fw-bold">Опыт работы (лет)</label>
-                            {{ form.experience_years|add_class:"form-control" }}
+                            {{ form.experience_years|add_class:"form-control"|attr:"placeholder:3" }}
                         </div>
 
                         <div class="mb-4">
                             <label class="form-label fw-bold">О себе</label>
-                            {{ form.about|add_class:"form-control"|attr:"rows:6" }}
+                            {{ form.about|add_class:"form-control"|attr:"rows:6"|attr:"placeholder:Расскажите о себе кратко" }}
                         </div>
 
                         <div class="mb-4">
                             <label class="form-label fw-bold">Телефон</label>
-                            {{ form.phone_number|add_class:"form-control" }}
+                            {{ form.phone_number|add_class:"form-control"|attr:"placeholder:+996700123456" }}
                         </div>
 
                         <div class="form-check mb-5">

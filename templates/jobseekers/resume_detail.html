@@ -12,10 +12,10 @@
                 <div class="card-body py-5">
                     {% if profile.photo %}
                         <img src="{{ profile.photo.url }}" alt="{{ profile.user.get_full_name }}"
-                             class="rounded-circle mb-4" style="width: 150px; height: 150px; object-fit: cover;">
+                             class="rounded-circle mb-4" style="width:150px; height:150px; object-fit:cover;">
                     {% else %}
                         <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mb-4"
-                             style="width: 150px; height: 150px; margin: 0 auto; font-size: 3rem;">
+                             style="width:150px; height:150px; font-size:3rem; margin:0 auto;">
                             {{ profile.user.get_full_name|first|upper|default:profile.user.username|first|upper }}
                         </div>
                     {% endif %}
@@ -42,7 +42,6 @@
                         </div>
                     {% endif %}
 
-                    <!-- КНОПКА ПРИГЛАШЕНИЯ — ПРОСТАЯ ССЫЛКА -->
                     {% if user.is_authenticated and user.role == 'employer' and user.company %}
                         <div class="mt-5">
                             <a href="{% url 'employers:invite_jobseeker' profile.user.username %}"
@@ -54,7 +53,6 @@
                 </div>
             </div>
 
-            <!-- Навыки -->
             {% if profile.skills.exists %}
             <div class="card border-0 shadow-sm mt-4">
                 <div class="card-header bg-white fw-bold">Навыки</div>

@@ -4,112 +4,265 @@
 {% block title %}Вакансии — Работа.kg{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <h1 class="fw-bold mb-4">Поиск вакансий</h1>
+<style>
+:root {
+    --gray-dark: #6F7375;
+    --gray-medium: #A7A9AC;
+    --beige-dark: #A49786;
+    --beige-light: #D9CBBF;
+    --cream: #F9F6EF;
+    --background: #FAF9F6;
+    --text-dark: #4B4A48;
+    --text-light: #9E9A90;
+}
 
-    <!-- ФИЛЬТРЫ -->
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body">
-            <form method="get" class="row g-3">
-                <div class="col-md-4">
-                    <input type="text" name="q" class="form-control" placeholder="Должность или компания"
-                           value="{{ request.GET.q|default:'' }}">
-                </div>
-                <div class="col-md-3">
-                    <select name="category" class="form-select">
-                        <option value="">Все категории</option>
-                        {% for cat in categories %}
-                        <option value="{{ cat.id }}" {% if request.GET.category == cat.id|stringformat:"s" %}selected{% endif %}>
-                            {{ cat.name }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <input type="number" name="salary_from" class="form-control" placeholder="Зарплата от (сом)"
-                           value="{{ request.GET.salary_from|default:'' }}">
-                </div>
-                <div class="col-md-3">
-                    <input type="text" name="duties" class="form-control" placeholder="Ключевые слова в обязанностях"
-                           value="{{ request.GET.duties|default:'' }}">
-                </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100">Найти</button>
-                </div>
-                <div class="col-md-2">
-                    <a href="{% url 'employers:all_vacancies' %}" class="btn btn-outline-secondary w-100">Сбросить</a>
-                </div>
-            </form>
-        </div>
+/* Заголовок */
+.page-title {
+    color: var(--text-dark);
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+/* === ФИЛЬТРЫ === */
+.filters-card {
+    background: var(--cream);
+    border-radius: 24px;
+    padding: 25px;
+    border: 1px solid rgba(164,147,134,0.25);
+    box-shadow: 0 12px 28px rgba(164,147,134,0.18);
+}
+
+.filters-card input,
+.filters-card select {
+    border-radius: 16px;
+    border: 1px solid var(--gray-medium);
+    height: 48px;
+}
+.filters-card input:focus,
+.filters-card select:focus {
+    border-color: var(--beige-dark);
+    box-shadow: 0 0 0 4px rgba(164,147,134,0.2);
+}
+
+/* Кнопки */
+.btn-search {
+    background: linear-gradient(135deg, var(--beige-dark), var(--beige-light));
+    border: none;
+    color: var(--cream);
+    font-weight: 600;
+    border-radius: 40px;
+}
+.btn-search:hover {
+    background: linear-gradient(135deg, var(--gray-dark), var(--beige-dark));
+}
+
+.btn-reset {
+    border-radius: 40px;
+    border-color: var(--gray-dark);
+    color: var(--gray-dark);
+}
+.btn-reset:hover {
+    background: var(--gray-dark);
+    color: var(--cream);
+}
+
+/* === КАРТОЧКИ ВАКАНСИЙ === */
+.vacancy-card {
+    background: var(--cream);
+    border-radius: 28px;
+    padding: 25px 22px;
+    min-height: 330px;
+    border: 1px solid rgba(164,147,134,0.25);
+    box-shadow: 0 14px 36px rgba(164,147,134,0.15);
+    transition: 0.35s ease;
+    position: relative;
+}
+.vacancy-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 50px rgba(164,147,134,0.28);
+}
+
+/* Заголовок вакансии */
+.vacancy-card h5 a {
+    color: var(--text-dark);
+    text-decoration: none;
+}
+.vacancy-card h5 a:hover {
+    text-decoration: underline;
+}
+
+/* Компания */
+.company-name {
+    color: var(--beige-dark);
+    font-weight: 600;
+}
+
+/* Описание */
+.vacancy-desc {
+    color: var(--gray-dark);
+}
+
+/* Подвал карты */
+.vacancy-footer {
+    color: var(--gray-medium);
+    text-align: right;
+    font-size: 0.85rem;
+}
+
+/* Анимация */
+.fade-up {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: 0.6s ease;
+}
+.fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+</style>
+
+<div class="container py-5">
+
+    <h1 class="page-title">Поиск вакансий</h1>
+
+    <!-- === ФИЛЬТРЫ === -->
+    <div class="filters-card mb-5">
+        <form method="get" class="row g-4 align-items-end">
+
+            <div class="col-md-4">
+                <label class="form-label text-dark fw-semibold">Должность или компания</label>
+                <input type="text" name="q" class="form-control"
+                       placeholder="Например: менеджер"
+                       value="{{ request.GET.q|default:'' }}">
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label text-dark fw-semibold">Категория</label>
+                <select name="category" class="form-select">
+                    <option value="">Все категории</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.id }}"
+                        {% if request.GET.category == cat.id|stringformat:"s" %}selected{% endif %}>
+                        {{ cat.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label text-dark fw-semibold">Зарплата от</label>
+                <input type="number" name="salary_from" class="form-control"
+                       placeholder="Сом"
+                       value="{{ request.GET.salary_from|default:'' }}">
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label text-dark fw-semibold">Ключевые слова</label>
+                <input type="text" name="duties" class="form-control"
+                       placeholder="Например: продажа"
+                       value="{{ request.GET.duties|default:'' }}">
+            </div>
+
+            <div class="col-md-2 mt-3">
+                <button type="submit" class="btn btn-search w-100">Найти</button>
+            </div>
+            <div class="col-md-2 mt-3">
+                <a href="{% url 'employers:all_vacancies' %}"
+                   class="btn btn-reset w-100">Сбросить</a>
+            </div>
+        </form>
     </div>
 
-    <!-- ВАКАНСИИ -->
+    <!-- === СПИСОК ВАКАНСИЙ === -->
     <div class="row g-4">
         {% for vacancy in vacancies %}
-        <div class="col-md-6 col-lg-4">
-            <div class="card h-100 border-0 shadow-sm hover-shadow">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="fw-bold mb-2">
-                        <a href="{% url 'employers:vacancy_detail' vacancy.pk %}"
-                           class="text-dark text-decoration-none stretched-link">
-                            {{ vacancy.title }}
-                        </a>
-                    </h5>
-                    <p class="text-primary fw-semibold mb-1">{{ vacancy.company.name }}</p>
-                    <p class="text-muted small mb-3">
-                        {{ vacancy.location }}
-                        {% if vacancy.salary_from %}
-                            <br>от {{ vacancy.salary_from|floatformat:0 }} сом
-                        {% endif %}
-                    </p>
-                    <p class="text-muted flex-grow-1">{{ vacancy.description|truncatewords:18 }}</p>
+        <div class="col-md-6 col-lg-4 fade-up">
+            <div class="vacancy-card h-100 d-flex flex-column">
 
-                    <!-- ДВЕ НЕЗАВИСИМЫЕ КНОПКИ — ГАРАНТИРОВАННО РАБОТАЕТ -->
-                    <div class="mt-4 d-flex gap-2">
-                        <!-- КНОПКА "ПОДРОБНЕЕ" -->
-                        <a href="{% url 'employers:vacancy_detail' vacancy.pk %}"
-                           class="btn btn-outline-primary flex-fill">
-                            Подробнее
-                        </a>
+                <!-- Заголовок -->
+                <h5 class="fw-bold mb-2">
+                    <a href="{% url 'employers:vacancy_detail' vacancy.pk %}">
+                        {{ vacancy.title }}
+                    </a>
+                </h5>
 
-                        <!-- КНОПКА "ОТКЛИКНУТЬСЯ" — САМООБНОВЛЯЮЩАЯСЯ -->
-                        {% if user.is_authenticated and user.role == 'jobseeker' %}
-                            {% if vacancy.already_applied or vacancy.id in applied_vacancy_ids %}
-                                <button class="btn btn-secondary flex-fill" disabled>
-                                    Отклик отправлен
-                                </button>
-                            {% else %}
-                                <form method="post" action="{% url 'jobseekers:apply_vacancy' vacancy.pk %}" class="d-inline">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-success flex-fill">
-                                        Откликнуться
-                                    </button>
-                                </form>
-                            {% endif %}
-                        {% elif user.is_authenticated and user.role == 'employer' and vacancy.company.user == user %}
-                            <small class="text-muted d-block w-100 text-center mt-2">Это ваша вакансия</small>
+                <!-- Компания -->
+                <p class="company-name mb-1">{{ vacancy.company.name }}</p>
+
+                <!-- Локация + зарплата -->
+                <p class="text-light small mb-2">
+                    {{ vacancy.location }}
+                    {% if vacancy.salary_from %}
+                        <br>от <strong>{{ vacancy.salary_from|floatformat:0 }}</strong> сом
+                    {% endif %}
+                </p>
+
+                <!-- Краткое описание -->
+                <p class="vacancy-desc flex-grow-1">
+                    {{ vacancy.description|truncatewords:18 }}
+                </p>
+
+                <!-- Кнопки -->
+                <div class="mt-3 d-flex gap-2">
+                    <a href="{% url 'employers:vacancy_detail' vacancy.pk %}"
+                       class="btn btn-outline-secondary flex-fill"
+                       style="border-radius: 40px;">
+                        Подробнее
+                    </a>
+
+                    {% if user.is_authenticated and user.role == 'jobseeker' %}
+                        {% if vacancy.already_applied or vacancy.id in applied_vacancy_ids %}
+                            <button class="btn btn-secondary flex-fill" style="border-radius: 40px;" disabled>
+                                Отклик отправлен
+                            </button>
                         {% else %}
-                            <a href="{% url 'core:login' %}?next={{ request.path }}"
-                               class="btn btn-outline-primary flex-fill">
-                                Войти
-                            </a>
+                            <form method="post" action="{% url 'jobseekers:apply_vacancy' vacancy.pk %}"
+                                  class="d-inline flex-fill">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success w-100"
+                                        style="border-radius: 40px;">
+                                    Откликнуться
+                                </button>
+                            </form>
                         {% endif %}
-                    </div>
+                    {% elif user.is_authenticated and user.role == 'employer' and vacancy.company.user == user %}
+                        <small class="text-light d-block w-100 text-center mt-2">Это ваша вакансия</small>
+                    {% else %}
+                        <a href="{% url 'core:login' %}?next={{ request.path }}"
+                           class="btn btn-outline-secondary flex-fill"
+                           style="border-radius: 40px;">
+                            Войти
+                        </a>
+                    {% endif %}
                 </div>
 
-                <div class="card-footer bg-transparent text-muted small text-end">
+                <!-- Дата -->
+                <div class="vacancy-footer mt-3">
                     {{ vacancy.created_at|date:"d.m.Y" }}
                 </div>
             </div>
         </div>
         {% empty %}
         <div class="col-12 text-center py-5">
-            <h4 class="text-muted">Вакансии не найдены</h4>
-            <a href="{% url 'employers:all_vacancies' %}" class="btn btn-outline-primary mt-3">
-                Показать все вакансии
-            </a>
+            <h4 class="text-light">Вакансии не найдены</h4>
+            <a href="{% url 'employers:all_vacancies' %}" class="btn btn-reset mt-3 px-4">Показать все</a>
         </div>
         {% endfor %}
     </div>
+
 </div>
+
+<script>
+/* Анимация появления карточек */
+const elements = document.querySelectorAll('.fade-up');
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+        if (e.isIntersecting) e.target.classList.add('visible');
+    });
+}, { threshold: 0.2 });
+
+elements.forEach(el => observer.observe(el));
+</script>
+
 {% endblock %}
